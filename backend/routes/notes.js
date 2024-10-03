@@ -28,11 +28,11 @@ router.post('/add-notes',[
     body('title','Enter valid title').isLength({min:3}),
     body('description','Enter valid description').isLength({min:5})
 ],getUserFromMiddleware,async(req,res)=>{
-    
+    let success = false;
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()){
-            res.status(400).json({error: errors.array()});
+            res.status(400).json({success,error: errors.array()});
         }
         const {title,description,tag} = req.body;
         const note = new Notes({
@@ -42,11 +42,12 @@ router.post('/add-notes',[
             user:req.user.id
         })  
         const savedNote = await note.save();
-        res.json(savedNote);
+        success = true;
+        res.json({success,savedNote});
 
     } catch (error) {
         console.error(error.message);
-        res.status(500).send('Internal server error');
+        res.status(500).send({success,msg:"Internal server error"});
     }
 
 
@@ -57,10 +58,10 @@ router.post('/add-notes',[
 
 
 router.put('/update-note/:id',getUserFromMiddleware,async(req,res)=>{
-
+    const success =false;
     try {
         const {title,description,tag}= req.body;
-
+        
         const newNote = {};
         if(title){
             newNote.title= title;
@@ -75,19 +76,18 @@ router.put('/update-note/:id',getUserFromMiddleware,async(req,res)=>{
         let note = await Notes.findById(req.params.id)
 
         if(!note){
-            return res.status(401).send("Note not Found");
+            return res.status(401).send({success,msg:"Note not Found"});
         }
         if( note.user.toString() !== req.user.id){
-            return res.status(401).send("Not Allowed");
+            return res.status(401).send({success,msg:"Not Allowed"});
         }
 
         note = await Notes.findByIdAndUpdate(req.params.id,{$set:newNote},{new:true});
-
-        res.json({note});
+        res.json({success:true,note});
 
     } catch (error) {
         console.error(error.errors);
-        res.status(500).send('Internal server error');   
+        res.status(500).send({success,msg:"Internal server error"});   
     }
 
 })
@@ -96,28 +96,28 @@ router.put('/update-note/:id',getUserFromMiddleware,async(req,res)=>{
 
 
 router.delete('/delete-note/:id',getUserFromMiddleware,async(req,res)=>{
-
+    let success = false;
     try {
     
         let note = await Notes.findById(req.params.id)
 
         if(!note){
             console.log("note not found");
-            return res.status(400).send("Note not Found");
+            return res.status(400).send({success,msg:"Note not Found"});
         }
         
         if(note.user.toString() !== req.user.id){
-            return res.status(401).send("Not Allowed");
+            return res.status(401).send({success,msg:"Not Allowed"});
         }
         
         // note = await Notes.findByIdAndUpdate(req.params.id,{$set:newNote},{new:true});  
         note = await Notes.findByIdAndDelete(req.params.id,)
-
-        res.json({"success":"note has been deleted","note":note});
+        success=true;
+        res.json({success,note});
 
     } catch (error) {
         console.error(error.message);
-        res.status(500).send('Internal server error');   
+        res.status(500).send({success,msg:"Internal server error"});   
     }
 
 })

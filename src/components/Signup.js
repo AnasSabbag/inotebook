@@ -1,20 +1,20 @@
-import React,{useState} from 'react'
+import React,{useState,useContext} from 'react'
 import { useNavigate } from "react-router-dom";
-
+import alertContext from '../context/alerts/alertContext';
 function Signup() {
+
+    const {displayAlert} =  useContext(alertContext);
+    const [alrt, setAlert] = useState({type:"",msg:""})
 
     const [credentials, setCredentials] = useState({name:"",email:"",password:"",cpassword:""})
     const navigate = useNavigate();
     const handleOnClick =(event)=>{
         setCredentials({...credentials,[event.target.name]:event.target.value})
     }
-    const handleOnSubmit =async (e)=>{
-        console.log("submit handlie click hdb ",credentials);
-        
+    const handleOnSubmit = async (e)=>{
         e.preventDefault();
-        
 
-        const  host = "http://localhost:5000";
+        const  host = process.env.REACT_APP_HOST_URL;
 
         const response = await fetch(`${host}/api/auth/createuser`,{
             method:'POST',
@@ -24,14 +24,22 @@ function Signup() {
             body : JSON.stringify({name: credentials.name,email : credentials.email,password : credentials.password})
 
         });
-        const json = await response.json();
-        console.log(json)
+        const json = await response.json();        
+        const alertData = alrt;
         if(json.success){
             localStorage.setItem('token',json.authToken);
-            navigate("/"); 
+            navigate("/");
+            alertData.type="success"
+            alertData.msg ="User Added successfully"
+            setAlert(alertData)
+            displayAlert(alrt);
         }else{
-            alert('Invaild credential')
+            alertData.type="danger"
+            alertData.msg ="User could not added "
+            setAlert(alertData)
+            displayAlert(alrt);
         }
+
         
     }
 

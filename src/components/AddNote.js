@@ -8,7 +8,7 @@ const AddNote = () => {
     // eslint-disable-next-line 
     const {addNote} = context;
     const [note, setNote] = useState({title:"",description:"",tag:""})
-    const handleSubmit =(event)=>{
+    const handleSubmit =  (event)=>{
         event.preventDefault();
         addNote(note);
         setNote({title:"",description:"",tag:""});

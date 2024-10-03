@@ -12,12 +12,14 @@ import About from './components/About';
 import NoteState from './context/notes/NoteState';
 import Signup from './components/Signup';
 import Login from './components/Login';
+import AlertState from './context/alerts/AlertState';
 
 
 
 function App() {
   return (
     <>
+    <AlertState>
       <NoteState >
             <Router>
                 <Navbar />
@@ -32,6 +34,7 @@ function App() {
                 </div>
             </Router>
       </NoteState>
+      </AlertState>
     </>
   );
 }

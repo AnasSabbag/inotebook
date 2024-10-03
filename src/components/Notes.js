@@ -7,9 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 
 const Notes = () => {
-
-    const context = useContext(NoteContext)
-    const { notes, getNotes,editNote } = context;
+    const { notes, getNotes,editNote } = useContext(NoteContext);
     const ref = useRef(null)
     const navigate = useNavigate();
     useEffect(() => {
@@ -41,9 +39,6 @@ const Notes = () => {
     return (
         <>
             <AddNote />
-            {/* <button ref={ref} type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                Launch demo modal
-            </button> */}
             <div className="modal fade" id="exampleModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div className="modal-dialog" role="document">
                     <div className="modal-content">
