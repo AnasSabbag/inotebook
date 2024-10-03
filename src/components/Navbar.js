@@ -1,8 +1,13 @@
-import React, { useEffect } from 'react'
+import React, { useEffect,useContext,useState } from 'react'
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
+import alertContext from '../context/alerts/alertContext';
 const Navbar = () => {
+  const context = useContext(alertContext);
+  const {displayAlert} = context;
+  const [alrt, setAlert] = useState({type:"",msg:""})
+
   let location = useLocation()
   const navigate = useNavigate();
   useEffect(() => {
@@ -12,6 +17,12 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem('token')
     navigate("/login");
+    // send alert 
+    const alertData = alrt;
+    alertData.type="success"
+    alertData.msg ="Logout successfully"
+    setAlert(alertData)
+    displayAlert(alrt);
   }
 
 
@@ -52,12 +63,5 @@ const Navbar = () => {
   )
 }
 
-// {
-//   !localStorage.getItem('token') ? <form className="d-flex" role="search">
-//     <Link className="btn btn-primary mx-1" to="/login" role="button">Login</Link>
-//     <Link className="btn btn-primary mx-1" to="/sign-up" role="button">Sign up</Link>
-//   </form> : <button onClick={handleLogout} className="btn btn-primary">Logout</button>
-
-// }
 
 export default Navbar

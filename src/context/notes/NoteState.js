@@ -1,13 +1,18 @@
-import React from "react";
 import NoteContext from "./noteContext";
-import { useState } from "react";
+import React,{ useState,useContext } from "react";
+import alertContext from '../alerts/alertContext';
+
 
 const NoteState = (props) => {  // Pass props here
-    
-    const  host = "http://localhost:5000"
+    const context = useContext(alertContext);
+    const {displayAlert} = context;
+    const [alrt, setAlert] = useState({type:"",msg:""})
+
+    const host = process.env.REACT_APP_HOST_URL;
     const notesInitial=[]
     const [notes, setNotes] = useState(notesInitial)
     
+
     const getNotes = async ()=>{ 
         
         const response = await fetch(`${host}/api/notes/get-all-notes-of-user`,{
@@ -37,10 +42,21 @@ const NoteState = (props) => {  // Pass props here
             body : JSON.stringify({title:note.title,description:note.description,tag:note.tag})
 
         });
-        const newNote = await response.json();
-        
-        setNotes(notes.concat(newNote));
-      
+        const jsonRes = await response.json();
+        setNotes(notes.concat(jsonRes.savedNote));
+        const alertData=alrt;
+        if(jsonRes.success){
+            alertData.type="success"
+            alertData.msg ="Note Added successfully"
+            setAlert(alertData)
+            displayAlert(alrt);
+        }else{
+            alertData.type="danger"
+            alertData.msg ="Note did not added "
+            setAlert(alertData)
+            displayAlert(alrt);
+        }
+
     }
 
     //  deleteNote
@@ -54,17 +70,28 @@ const NoteState = (props) => {  // Pass props here
             }
         });
         
-        const json = await response.json();
-        console.log(json.success)
+        const jsonRes = await response.json();
+        
         const newNotes = notes.filter((note)=>{return note._id!==id})
-        setNotes(newNotes)    
+        setNotes(newNotes)   
+
+        const alertData=alrt;
+        if(jsonRes.success){
+            alertData.type="success"
+            alertData.msg ="Note deleted successfully"
+            setAlert(alertData)
+            displayAlert(alrt);
+        }else{
+            alertData.type = "danger"
+            alertData.msg ="Note did not deleted "
+            setAlert(alertData)
+            displayAlert(alrt);
+        }
 
 
     }
     // editNote
     const editNote = async(note)=>{
-        // todo : api call
-        console.log('edit note ',note);
         const response = await fetch(`${host}/api/notes/update-note/${note.id}`,{
             method:'PUT',
             headers:{
@@ -74,9 +101,7 @@ const NoteState = (props) => {  // Pass props here
             body : JSON.stringify({title:note.etitle,description:note.edescription,tag:note.etag})
 
         })
-        const json = await response.json();
-        console.log(json);
-        
+        const jsonRes = await response.json();
         // this will deep copy 
         let newNotes = JSON.parse(JSON.stringify(notes));
         
@@ -90,8 +115,19 @@ const NoteState = (props) => {  // Pass props here
                 break
             }
         }
-        console.log(newNotes);
         setNotes(newNotes);
+        const alertData = alrt;
+        if(jsonRes.success){
+            alertData.type="success"
+            alertData.msg ="Note updated successfully"
+            setAlert(alertData)
+            displayAlert(alrt);
+        }else{
+            alertData.type = "danger"
+            alertData.msg ="Note did not deleted "
+            setAlert(alertData)
+            displayAlert(alrt);
+        }
 
     }
 

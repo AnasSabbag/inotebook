@@ -1,9 +1,14 @@
 
-import React, { useState } from 'react'
+import React, { useState,useContext } from 'react'
 import { useNavigate } from "react-router-dom";
-
+import alertContext from '../context/alerts/alertContext';
 
 function Login() {
+    const context = useContext(alertContext);
+    const {displayAlert} = context;
+    
+    const [alrt, setAlert] = useState({type:"",msg:""})
+    
 
     const [credentials, setCredentials] = useState({email:"",password:""})
     const navigate = useNavigate();
@@ -11,10 +16,8 @@ function Login() {
         setCredentials({...credentials,[event.target.name]:event.target.value})
     }
     const handleOnSubmit =async (e)=>{
-        console.log("submit handlie click hdb ",credentials);
-        
         e.preventDefault();
-        const  host = "http://localhost:5000";
+        const  host = process.env.REACT_APP_HOST_URL;
         const response = await fetch(`${host}/api/auth/login`,{
             method:'POST',
             headers:{
@@ -24,12 +27,20 @@ function Login() {
 
         });
         const json = await response.json();
-        console.log(json)
+        const alertData = alrt;
+
         if(json.success){
             localStorage.setItem('token',json.authToken);
             navigate("/home"); 
+            alertData.type="success"
+            alertData.msg ="Login successfull"
+            setAlert(alertData)
+            displayAlert(alrt);
         }else{
-            alert('Invaild credential')
+            alertData.type="danger"
+            alertData.msg ="Invalid Credentials !!!"
+            setAlert(alertData)
+            displayAlert(alrt);
         }
         
     }
