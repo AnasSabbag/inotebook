@@ -13,7 +13,6 @@ router.post('/createuser',[
     body('email','Enter valid email').isEmail(),
     body('password','Password atleast valid 5 character long').isLength({min:5})
 ],async(req,res)=>{
-    console.log("called");
     let success =false;
     const errors = validationResult(req);
     if(!errors.isEmpty()){
@@ -115,6 +114,110 @@ router.get('/get-user',getUserFromMiddleware,async (req,res)=>{
     }
 
 })
+
+// get all user
+router.get('/get-all-users',async (_req,res)=>{
+    try {
+        // const userId = req.user.id;
+        const users = await User.find({});
+        // console.log(users);
+        res.json(users);
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send({message:"Internala server error"});
+    }
+
+})
+
+
+// update user
+
+router.put('/update-user',[
+    body('name','Enter valid name').isLength({min:3}),
+    body('email','Enter valid email').isEmail(),
+    body('password','Password atleast valid 5 character long').isLength({min:5})
+    ],
+    getUserFromMiddleware,async(req,res)=>{
+        const success =false;
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            return res.status(400).json({success,errors:errors.array()});
+        }
+        try {
+            
+            const {name,email,password}= req.body;
+            
+            const newUser = {};
+            const salt = await bcrypt.genSalt(10);
+            const secPass = await  bcrypt.hash(password,salt)
+            newUser.name= name;
+            newUser.email= email;
+            newUser.password=secPass;
+            newUser.id = req.user.id;
+            let user ={};
+            user = await User.findOne({_id:req.user.id});
+            if(user === null){
+                return res.status(400).json({success,errors:"user does not exists. "})
+            }
+
+            // check email is already exist for that user 
+            if(email !== user.email){
+
+                let chek= await User.find({
+                    email: {$eq:email},
+                    _id : {$ne:req.user.id}
+                })
+                
+                if(chek.length !==0 ){
+                    return res.status(400).json({success,errors:"email already exists. "})
+                }
+            }
+
+            user = await User.findByIdAndUpdate(req.user.id,{$set:newUser});
+            res.json({success:true,newUser});
+
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).send({success,msg:"Internal server error"});   
+        }
+
+})
+
+
+
+
+
+// delete user by id 
+
+router.delete('/delete-user/:id',getUserFromMiddleware,async(req,res)=>{
+    let success = false;
+    try {
+    
+        let user = await User.findById(req.params.id)
+
+        if(!user){
+            console.log("user not found");
+            return res.status(400).send({success,msg:"User not Found"});
+        }
+        
+        // if(user._id.toString() !== req.user.id){
+        //     console.log("user :",user);
+        //     console.log("req.user.id: ",req.user.id);
+        //     return res.status(401).send({success,msg:"Not Allowed"});
+        // }
+         
+        user = await User.findByIdAndDelete(req.params.id,)
+        success=true;
+        res.json({success,user});
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send({success,msg:"Internal server error"});   
+    }
+
+})
+
 
 
 

@@ -1,6 +1,7 @@
 import React, { useEffect,useContext,useState } from 'react'
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { IconUsersGroup } from '@tabler/icons-react';
 
 import alertContext from '../context/alerts/alertContext';
 const Navbar = () => {
@@ -24,7 +25,10 @@ const Navbar = () => {
     setAlert(alertData)
     displayAlert(alrt);
   }
-
+  const hanleUserProfile=()=>{
+    console.log("youb can crud bon users ");
+    navigate("/users-info")
+  }
 
   return (
     <div>
@@ -46,11 +50,12 @@ const Navbar = () => {
                 </ul>
             
               </div>
-
+              
             </div>
-            <button onClick={handleLogout} className="btn btn-primary">Logout</button>
+            <IconUsersGroup stroke={2} className="mx-4" style ={{color:'white'}} onClick={hanleUserProfile} />
+            <button onClick={handleLogout} className="btn btn-primary" >Logout</button>
           </nav>: <div className="container my-4">
-         <form className="d-flex" role="search">
+         <form className="d-flex" role="search" style={{"justifyContent":'end'}}>
             <Link className="btn btn-primary mx-1" to="/login" role="button">Login</Link>
             <Link className="btn btn-primary mx-1" to="/sign-up" role="button">Sign up</Link>
           </form>
