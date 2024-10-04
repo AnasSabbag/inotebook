@@ -6,9 +6,7 @@ import alertContext from '../context/alerts/alertContext';
 function Login() {
     const context = useContext(alertContext);
     const {displayAlert} = context;
-    
     const [alrt, setAlert] = useState({type:"",msg:""})
-    
 
     const [credentials, setCredentials] = useState({email:"",password:""})
     const navigate = useNavigate();
@@ -37,7 +35,7 @@ function Login() {
             setAlert(alertData)
             displayAlert(alrt);
         }else{
-            alertData.type="danger"
+            alertData.type = "danger"
             alertData.msg ="Invalid Credentials !!!"
             setAlert(alertData)
             displayAlert(alrt);
@@ -45,17 +43,15 @@ function Login() {
         
     }
   return (
-    <div className="text center ">
-        <form onSubmit={handleOnSubmit}>
+    <div className="container my-4">
+        <form className="d-flex" role="search" style={{"justifyContent":'center'}} onSubmit={handleOnSubmit}  >
             <div className="mb-3" style={{width:'30%'}} >
-                <label htmlFor="email" className="form-label ">Email address</label>
-                <input type="email" className="form-control" id="email" name="email" onChange={handleOnClick} aria-describedby="emailHelp"/>
+                <label htmlFor="email" className="form-label" >Email address</label>
+                <input type="email" className="form-control my-2" id="email" name="email" onChange={handleOnClick} aria-describedby="emailHelp"/>
+                <label htmlFor="password" className="form-label my-2">Password</label>
+                <input type="password" className="form-control my-2" name="password" onChange={handleOnClick} id="password"/>
+                <button type="submit" className="btn btn-primary my-2">Log in</button>
             </div>
-            <div className="mb-3" style={{width:'30%'}} >
-                <label htmlFor="password" className="form-label">Password</label>
-                <input type="password" className="form-control" name="password" onChange={handleOnClick} id="password"/>
-            </div>
-            <button type="submit" className="btn btn-primary">Log in</button>
         </form>
     </div>
   )
